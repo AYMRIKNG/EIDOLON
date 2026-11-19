@@ -1,0 +1,68 @@
+# ── EIDOLON — Ignored Files & Runtime Artifacts ───────────────────────────────
+# Everything listed here is generated at runtime or contains sensitive local
+# state. A fresh clone boots cleanly into the onboarding flow without any of
+# these files committed.
+
+# ── Secrets & Credentials (NEVER commit) ──────────────────────────────────────
+config/api_keys.json
+config/certs/
+config/whatsapp_web/
+certification/
+**/token*.json
+**/client_secret*.json
+*credentials*.json
+.env
+.env.*
+
+# ── Personal Memory & Local Vector Stores ─────────────────────────────────────
+memory/long_term.json
+memory/*.db
+memoire/
+
+# ── Local Agent Source Binaries & Generated Outputs ───────────────────────────
+agents/*.pdf
+agents/*.zip
+output/
+uploads/
+scratch/
+scratch_*.txt
+test_search*.py
+Rapport_*.pdf
+
+# ── IDE Bridge Runtime Markers ────────────────────────────────────────────────
+config/ide_bridge.*.running
+config/ide_bridge.json
+
+# ── Python Build & Cache Artifacts ────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Virtual Environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Editors, Agent Caches & OS Noise ──────────────────────────────────────────
+.gemini/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs & Media Runtime Output ───────────────────────────────────────────────
+*.log
+logs/
+downloads/
+screenshots/

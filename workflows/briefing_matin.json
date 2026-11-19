@@ -1,0 +1,10 @@
+{
+  "id": "briefing_matin_001",
+  "name": "Briefing matinal mails",
+  "schedule": "08:00",
+  "pipeline": [
+    { "service": "gmail", "action": "fetch_unread", "params": { "max": 5 } },
+    { "service": "llm", "action": "summarize", "params": { "tone": "concise" } },
+    { "service": "tts", "action": "generate_audio", "params": { "voice": "eidolon_fr" } }
+  ]
+}
