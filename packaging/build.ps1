@@ -20,7 +20,12 @@ Write-Host "▶ EIDOLON $version — PyInstaller" -ForegroundColor Cyan
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller a échoué" }
 
 # Nothing personal may ship: the build must never contain a key or user data.
-$leaks = Get-ChildItem dist\EIDOLON -Recurse -Include api_keys.json, long_term.json, *.pem, ide_bridge.json -ErrorAction SilentlyContinue
+# (Libraries ship public files such as certifi\cacert.pem — only the app's own
+# config / memory folders are checked.)
+$leaks = @(
+  Get-ChildItem dist\EIDOLON -Recurse -Include api_keys.json, long_term.json, ide_bridge.json -ErrorAction SilentlyContinue
+  Get-ChildItem dist\EIDOLON\config, dist\EIDOLON\memory -Recurse -Include *.pem, *.key, *.db -ErrorAction SilentlyContinue
+) | Where-Object { $_ }
 if ($leaks) { throw "Données personnelles dans le build : $($leaks.FullName -join ', ')" }
 
 if ($NoInstaller) { Write-Host "✓ dist\EIDOLON\EIDOLON.exe"; exit 0 }
