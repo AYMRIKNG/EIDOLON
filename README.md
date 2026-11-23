@@ -61,6 +61,12 @@ Maintained by **[Aymerick (@AYMRIKNG)](https://github.com/AYMRIKNG)**
 
 ## Quick Start
 
+### Windows installer (no Python needed)
+
+Download `EIDOLON-Setup-<version>.exe` from [Releases](https://github.com/AYMRIKNG/EIDOLON/releases) and run it. It installs for the current user only (no admin rights), in `%LOCALAPPDATA%\Programs\EIDOLON`. On first launch EIDOLON asks for your Gemini API key and keeps it on your PC (`config\api_keys.json`); uninstalling keeps your key and memory for a later reinstall.
+
+Not included in the installer: the Kokoro voice, faster-whisper and spreadsheet analysis (pandas) — use the source install below for those. Building the installer yourself: `powershell -ExecutionPolicy Bypass -File packaging\build.ps1` (needs PyInstaller and Inno Setup 6); pushing a `v*` tag builds it on GitHub Actions and drafts a release.
+
 ### Prerequisites
 
 - **Python 3.11 – 3.13**

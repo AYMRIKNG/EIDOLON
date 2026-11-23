@@ -735,8 +735,14 @@ def _is_inside(child: str, parent: str) -> bool:
 CLAUDE_SETTINGS = Path.home() / ".claude" / "settings.json"
 
 
+HOOK_MARKERS = ("eidolon_hook.py", "eidolon-hook.exe", "jarvis_hook.py")
+
+
 def _hook_command() -> str:
     import sys
+    if getattr(sys, "frozen", False):
+        # installed app: a small console helper ships next to EIDOLON.exe
+        return f'"{Path(sys.executable).parent / "eidolon-hook.exe"}"'
     py = Path(sys.executable)
     # pythonw has no console window to flash on Windows
     if py.name.lower() == "python.exe" and (py.parent / "pythonw.exe").exists():
@@ -747,7 +753,7 @@ def _hook_command() -> str:
 def claude_hooks_installed() -> bool:
     try:
         content = CLAUDE_SETTINGS.read_text(encoding="utf-8")
-        return "eidolon_hook.py" in content
+        return any(m in content for m in HOOK_MARKERS)
     except Exception:
         return False
 
@@ -784,7 +790,7 @@ def uninstall_from(data: dict) -> None:
     for event in list(hooks):
         kept = [e for e in hooks[event]
                 if not any(
-                    ("eidolon_hook.py" in h.get("command", "") or "jarvis_hook.py" in h.get("command", ""))
+                    any(m in h.get("command", "") for m in HOOK_MARKERS)
                     for h in e.get("hooks", [])
                 )]
         if kept:

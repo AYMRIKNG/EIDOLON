@@ -178,6 +178,7 @@ class _Bridge(QObject):
     sig_show_resources = pyqtSignal(list)
     sig_confirm = pyqtSignal(object)
     sig_hide_confirm = pyqtSignal()
+    sig_ask_key = pyqtSignal(bool)          # first launch / rejected key: show the key window
     sig_open_team = pyqtSignal(str)
     sig_code_event = pyqtSignal(str, str)   # IDE bridge event, change id
     sig_mission = pyqtSignal(str)           # agent-team mission id that changed
@@ -2253,12 +2254,17 @@ class EidolonUI:
         self._app.setQuitOnLastWindowClosed(False)
         self._bridge = _Bridge()
         self._overlay = OverlayWindow(self, self._bridge)
+        self._key_dialog = None
+        self._key_invalid = False
+        self._bridge.sig_ask_key.connect(self._show_key_dialog)
 
         self.root = _RootShim(self)
 
     # ── lifecycle & execution ────────────────────────────────────────────────
     def _stdin_loop(self):
         """Typed console lines become text commands."""
+        if sys.stdin is None or not sys.stdin.isatty():
+            return   # packaged app: there is no console to read from
         while True:
             line = sys.stdin.readline()
             if line == "":
@@ -2282,7 +2288,7 @@ class EidolonUI:
     def _check_config() -> bool:
         try:
             d = json.loads(API_FILE.read_text(encoding="utf-8"))
-            return bool(d.get("gemini_api_key")) and bool(d.get("os_system"))
+            return bool(d.get("gemini_api_key"))
         except Exception:
             return False
 
@@ -2338,16 +2344,36 @@ class EidolonUI:
         self._bridge.sig_log.emit(str(text))
 
     def wait_for_api_key(self):
-        """No setup screen: ask on the console if the key is missing."""
+        """Blocks the calling (engine) thread until a key is saved. The key is
+        asked in a small window on the GUI thread — never on a console, which
+        the installed app does not have."""
         if not self._ready:
-            key = input("Gemini API key: ").strip()
-            os_name = input("OS (windows/mac/linux) [windows]: ").strip() or "windows"
-            data = _read_full_config()
-            data.update({"gemini_api_key": key, "os_system": os_name})
-            _write_full_config(data)
-            self._ready = bool(key)
+            self._bridge.sig_ask_key.emit(self._key_invalid)
         while not self._ready:
             time.sleep(0.1)
+
+    def _show_key_dialog(self, invalid: bool):
+        from core.api_key_dialog import ApiKeyDialog, detected_os
+        if self._key_dialog is not None and self._key_dialog.isVisible():
+            self._key_dialog.raise_()
+            return
+
+        def saved(key: str):
+            data = _read_full_config()
+            data["gemini_api_key"] = key
+            data.setdefault("os_system", detected_os())
+            _write_full_config(data)
+            try:
+                from core import gemini
+                gemini.api_key(refresh=True)
+            except Exception:
+                pass
+            self._key_invalid = False
+            self._ready = True
+
+        self._key_dialog = ApiKeyDialog(self._assistant_name, invalid=invalid)
+        self._key_dialog.saved.connect(saved)
+        self._key_dialog.present()
 
     def start_speaking(self):
         self.set_state("SPEAKING")
@@ -2427,6 +2453,7 @@ class EidolonUI:
 
     def prompt_reconfig(self):
         self._ready = False
+        self._key_invalid = True
         self.wait_for_api_key()
 
     def notify_phone_connected(self) -> None:
