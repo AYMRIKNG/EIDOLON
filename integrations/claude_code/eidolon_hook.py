@@ -19,7 +19,10 @@ import sys
 
 PORT = int(os.environ.get("EIDOLON_REVIEW_PORT") or os.environ.get("JARVIS_REVIEW_PORT") or "47321")
 URL = f"http://127.0.0.1:{PORT}/hook"
-RUN_MARKER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "config", f"ide_bridge.{PORT}.running")
+# installed app: eidolon-hook.exe sits next to EIDOLON.exe; from source: two levels up
+_APP_DIR = (os.path.dirname(sys.executable) if getattr(sys, "frozen", False)
+            else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+RUN_MARKER = os.path.join(_APP_DIR, "config", f"ide_bridge.{PORT}.running")
 # Calls that may wait for your answer (EIDOLON answers at once for safe commands).
 BLOCKING_TOOLS = {"Edit", "Write", "MultiEdit", "Bash"}
 

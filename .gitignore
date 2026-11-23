@@ -66,3 +66,7 @@ desktop.ini
 logs/
 downloads/
 screenshots/
+
+# Packaging: generated at build time
+packaging/version_info.txt
+logs/
