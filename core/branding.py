@@ -5,7 +5,7 @@ from pathlib import Path
 
 APP_NAME = "EIDOLON"
 APP_SLUG = "eidolon"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 APP_AUTHOR = "Aymerick (@AYMRIKNG)"
 APP_REPO = "https://github.com/AYMRIKNG/EIDOLON"
 

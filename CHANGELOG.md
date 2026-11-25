@@ -4,6 +4,15 @@ All notable changes to **EIDOLON** will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.1] - 2026-11-25
+
+### Added
+- **Windows installer**: `EIDOLON-Setup-<version>.exe` (PyInstaller + Inno Setup), per-user install without admin rights; built and drafted as a GitHub Release when a `v*` tag is pushed.
+- **First-launch API key window**: the Gemini key is asked in a small HUD-styled window (no console needed) and stored only on the user's PC.
+
+### Fixed
+- Release build no longer mistakes public library certificates (`certifi`) for personal data.
+
 ## [1.0.0] - 2026-11-19
 
 ### Added
